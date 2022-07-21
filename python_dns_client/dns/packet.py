@@ -3,8 +3,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from python_dns_client.dns.buffer import DNSBuffer
 from python_dns_client.dns.header import DNSHeader
 from python_dns_client.dns.question import DNSQuestion
+from python_dns_client.dns.response import DNSResponse
 from python_dns_client.shared.protocols import Packable
 
 
@@ -13,19 +15,25 @@ class DNSPacket(Packable):
     header: DNSHeader
 
     questions: list[DNSQuestion] = field(default_factory=list)
-    answers: list[Packable] = field(default_factory=list)
+    answers: list[DNSResponse] = field(default_factory=list)
     # authority: list[Packable] = field(default_factory=list)
     # additional: list[Packable] = field(default_factory=list)
 
     @classmethod
-    def parse(cls, b: bytes) -> DNSPacket:
-        header = DNSHeader.parse(b[:12])
+    def parse(cls, b: bytes):
+        return cls.parse_from(DNSBuffer.create(b))
+
+    @classmethod
+    def parse_from(cls, buff: DNSBuffer) -> DNSPacket:
+        header = DNSHeader.parse_from(buff)
 
         # todo: add check for resp code
 
-        b = b[12:]
-        questions, b = cls._parse_questions(header.qd_count, b)
-        answers, b = cls._parse_answers(header.an_count, b)
+        questions = cls._parse_questions(
+            header.qd_count,
+            buff,
+        )
+        answers = cls._parse_answers(header.an_count, buff)
 
         return cls(header, questions, answers)
 
@@ -41,19 +49,25 @@ class DNSPacket(Packable):
 
     @staticmethod
     def _parse_questions(
-        n_q: int, b: bytes
-    ) -> tuple[list[DNSQuestion], bytes]:
+        n_q: int,
+        buff: DNSBuffer,
+    ) -> list[DNSQuestion]:
         questions: list[DNSQuestion] = []
 
         while n_q > 0:
-            q, b = DNSQuestion.parse(b)
+            q = DNSQuestion.parse_from(buff)
             questions.append(q)
             n_q -= 1
 
-        return questions, b
+        return questions
 
     @staticmethod
-    def _parse_answers(n_ans: int, b: bytes) -> tuple[list[Packable], bytes]:
-        # todo: parse answers
+    def _parse_answers(n_ans: int, buff: DNSBuffer) -> list[DNSResponse]:
+        responses = []
 
-        return [], b
+        while n_ans > 0:
+            ans = DNSResponse.parse_from(buff)
+            responses.append(ans)
+            n_ans -= 1
+
+        return responses

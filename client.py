@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import socket
 
-from python_dns_client.dns_packet import DNSPacket
-from python_dns_client.dns_query import DNSQuery
+from python_dns_client.dns.packet import DNSPacket
+from python_dns_client.dns.query import DNSQuery
 
 DNS_SERVER = "8.8.8.8"
 DNS_PORT = 53
@@ -14,17 +14,17 @@ try:
     sock.connect((DNS_SERVER, DNS_PORT))
     print("Connected!")
 
-    query = DNSQuery.cname_query("api.carbonteq-livestream.ml")
+    query = DNSQuery.ip_query("api.carbonteq-livestream.ml")
     query_bytes = query.to_bytes()
 
     sock.send(query_bytes)
 
     resp = sock.recv(1024)
 
-    print(resp)
+    resp_packet = DNSPacket.parse(resp)
+    assert resp_packet.header.an_count > 0
 
-    with open("test_data/test_resp", "wb") as f:
-        f.write(resp)
+    print(resp_packet.answers[-1].data)
 finally:
     sock.close()
     print("Done")

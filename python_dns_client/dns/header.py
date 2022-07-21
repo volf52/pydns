@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import ClassVar
 
 import python_dns_client.shared.utils as utils
+from python_dns_client.dns.buffer import DNSBuffer
 from python_dns_client.shared.constants import SHORT_INT_RANGE, TWO_BYTE_STRUCT
 from python_dns_client.shared.protocols import Packable
 
@@ -115,7 +116,13 @@ class DNSHeader(Packable):
 
     @classmethod
     def parse(cls, b: bytes):
-        assert len(b) == 12
+        return cls.parse_from(DNSBuffer.create(b))
+
+    @classmethod
+    def parse_from(cls, buff: DNSBuffer):
+        assert len(buff) >= 12
+
+        b = buff.get(12)
 
         (
             _id,
@@ -139,13 +146,7 @@ class DNSHeader(Packable):
         _id = self._id
         flags_container = self.flags.to_int()
 
-        # Add Z code
-
-        # Discard the rcode bits as they are zero anyways at this point
-        flags_container >>= 4
-        flags_container += self.z
-        flags_container <<= 4
-
+        flags_container |= self.z << 4
         flags_container += self.rcode  # last 4 bits, so no shifts needed
 
         qd_count, an_count, ns_count, ar_count = (

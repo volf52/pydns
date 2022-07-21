@@ -135,3 +135,4 @@ dist
 
 test_data
 tests
+client.py
