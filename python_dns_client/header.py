@@ -1,13 +1,14 @@
 import struct
 from dataclasses import dataclass
 from typing import ClassVar
+from python_dns_client.protocols import Packable
 
 import python_dns_client.utils as utils
 from python_dns_client.constants import SHORT_INT_RANGE, TWO_BYTE_STRUCT
 
 
 @dataclass(frozen=True)
-class DNSHeaderFlags:
+class DNSHeaderFlags(Packable):
     qr: bool
     aa: bool
     tc: bool
@@ -61,9 +62,17 @@ class DNSHeaderFlags:
     def to_bytes(self) -> bytes:
         return TWO_BYTE_STRUCT.pack(self.to_int())
 
+    @property
+    def is_query(self) -> bool:
+        return not self.qr
+
+    @property
+    def is_response(self) -> bool:
+        return self.qr
+
 
 @dataclass(frozen=True)
-class DNSHeader:
+class DNSHeader(Packable):
     _id: int  # 2 bytes
 
     # qr: bool  # 1 bit
@@ -93,7 +102,9 @@ class DNSHeader:
     def create(cls, flags: DNSHeaderFlags, questions: int, answers: int):
         id_ = utils.generate_new_short_id()
 
-        return cls(id_, flags, DNSHeader.Z_DEFAULT, 0, questions, answers, 0, 0)
+        return cls(
+            id_, flags, DNSHeader.Z_DEFAULT, 0, questions, answers, 0, 0
+        )
 
     @classmethod
     def query_header(cls, questions: int):
@@ -119,7 +130,9 @@ class DNSHeader:
 
         flags = DNSHeaderFlags.parse(flags_container)
 
-        return cls(_id, flags, z, rcode, qd_count, an_count, ns_count, ar_count)
+        return cls(
+            _id, flags, z, rcode, qd_count, an_count, ns_count, ar_count
+        )
 
     def to_bytes(self) -> bytes:
         _id = self._id

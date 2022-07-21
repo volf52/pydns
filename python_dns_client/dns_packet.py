@@ -1,31 +1,57 @@
 from dataclasses import dataclass, field
+from typing_extensions import Self
 
 from python_dns_client.header import DNSHeader
-from python_dns_client.question import DNSQuestion, DNSRecordType
+from python_dns_client.protocols import Packable
+from python_dns_client.question import DNSQuestion
 
 
 @dataclass
-class DNSPacket:
+class DNSPacket(Packable):
     header: DNSHeader
 
     questions: list[DNSQuestion] = field(default_factory=list)
-    answers: list[None] = field(default_factory=list)
-    authority: list[None] = field(default_factory=list)
-    additional: list[None] = field(default_factory=list)
+    answers: list[Packable] = field(default_factory=list)
+    # authority: list[Packable] = field(default_factory=list)
+    # additional: list[Packable] = field(default_factory=list)
 
     @classmethod
-    def create(cls, domain: str, record_type: DNSRecordType):
-        header = DNSHeader.query_header(1)
-        question = DNSQuestion.create(domain, record_type)
+    def parse(cls, b: bytes) -> Self:
+        header = DNSHeader.parse(b[:12])
 
-        return cls(header, [question])
+        # todo: add check for resp code
 
-    @classmethod
-    def ip_query(cls, domain: str):
-        return cls.create(domain, DNSRecordType.A)
+        b = b[12:]
+        questions, b = cls._parse_questions(header.qd_count, b)
+        answers, b = cls._parse_answers(header.an_count, b)
+
+        return cls(header, questions, answers)
 
     def to_bytes(self) -> bytes:
         b = [self.header.to_bytes()]
+
         b.extend((q.to_bytes() for q in self.questions))
+        b.extend((q.to_bytes() for q in self.answers))
+        # b.extend((q.to_bytes() for q in self.authority))
+        # b.extend((q.to_bytes() for q in self.additional))
 
         return b"".join(b)
+
+    @staticmethod
+    def _parse_questions(
+        n_q: int, b: bytes
+    ) -> tuple[list[DNSQuestion], bytes]:
+        questions: list[DNSQuestion] = []
+
+        while n_q > 0:
+            q, b = DNSQuestion.parse(b)
+            questions.append(q)
+            n_q -= 1
+
+        return questions, b
+
+    @staticmethod
+    def _parse_answers(n_ans: int, b: bytes) -> tuple[list[Packable], bytes]:
+        # todo: parse answers
+
+        return [], b

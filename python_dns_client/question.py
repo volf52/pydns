@@ -1,5 +1,6 @@
 import enum
 from dataclasses import dataclass
+from typing_extensions import Self
 
 from python_dns_client.constants import (
     NULL_BYTE,
@@ -7,6 +8,7 @@ from python_dns_client.constants import (
     ONE_BYTE_STRUCT,
     TWO_BYTE_STRUCT,
 )
+from python_dns_client.protocols import Packable
 
 
 class DNSRecordType(enum.Enum):
@@ -22,12 +24,12 @@ class DNSRecordType(enum.Enum):
 
 
 @dataclass(frozen=True)
-class LabelSequence:
+class LabelSequence(Packable):
     domain: str
     __packed: bytes
 
     @classmethod
-    def create(cls, domain: str):
+    def create(cls, domain: str) -> Self:
         # buff = []
         # total = 0
 
@@ -51,6 +53,31 @@ class LabelSequence:
 
         return LabelSequence(domain, packed)
 
+    @classmethod
+    def parse(cls, b: bytes) -> tuple[Self, bytes]:
+        domain_parts = []
+        idx = 0
+        total_len = len(b)
+
+        part_length: int
+        while idx < total_len and (part_length := b[idx]) != 0:
+            # part_length = b[idx]
+
+            if idx + part_length >= total_len:
+                raise ValueError(
+                    f"Invalid part length at idx {idx} for label sequence {b}"
+                )
+
+            start = idx + 1
+            idx += part_length + 1
+            part = b[start:idx].decode()
+            domain_parts.append(part)
+
+        domain = ".".join(domain_parts)
+        idx += 1
+
+        return LabelSequence(domain, b[:idx]), b[idx:]
+
     def to_bytes(self) -> bytes:
         return self.__packed
 
@@ -59,7 +86,7 @@ class LabelSequence:
 
 
 @dataclass(frozen=True)
-class DNSQuestion:
+class DNSQuestion(Packable):
     label_seq: LabelSequence
     record_type: DNSRecordType
 
@@ -68,12 +95,25 @@ class DNSQuestion:
     _class: int = 1
 
     @classmethod
-    def create(cls, domain: str, record_type: DNSRecordType):
+    def create(cls, domain: str, record_type: DNSRecordType) -> Self:
         lbl_seq = LabelSequence.create(domain)
 
         packed = lbl_seq.to_bytes() + record_type.to_bytes() + ONE_AS_SHORT
 
         return cls(lbl_seq, record_type, packed)
+
+    @classmethod
+    def parse(cls, b: bytes) -> tuple[Self, bytes]:
+        _packed = b
+
+        lbl, b = LabelSequence.parse(b)
+        assert len(b) >= 4  # must be 4 bytes or more
+
+        (record_type_val,) = TWO_BYTE_STRUCT.unpack(b[:2])
+        record_type = DNSRecordType(record_type_val)
+        (_class,) = TWO_BYTE_STRUCT.unpack(b[2:4])
+
+        return cls(lbl, record_type, _packed, _class), b[4:]
 
     @property
     def domain(self) -> str:
