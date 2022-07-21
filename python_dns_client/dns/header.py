@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 import struct
 from dataclasses import dataclass
 from typing import ClassVar
 
-import python_dns_client.utils as utils
-from python_dns_client.constants import SHORT_INT_RANGE, TWO_BYTE_STRUCT
-from python_dns_client.protocols import Packable
+import python_dns_client.shared.utils as utils
+from python_dns_client.shared.constants import SHORT_INT_RANGE, TWO_BYTE_STRUCT
+from python_dns_client.shared.protocols import Packable
 
 
 @dataclass(frozen=True)

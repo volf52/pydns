@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import struct
 
 MAX_SHORT_INT = 2**16 - 1

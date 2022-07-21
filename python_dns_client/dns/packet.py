@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from python_dns_client.header import DNSHeader
-from python_dns_client.protocols import Packable
-from python_dns_client.question import DNSQuestion
+from python_dns_client.dns.header import DNSHeader
+from python_dns_client.dns.question import DNSQuestion
+from python_dns_client.shared.protocols import Packable
 
 
 @dataclass

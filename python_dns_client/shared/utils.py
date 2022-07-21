@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 import random
 import time
 
-from python_dns_client.constants import MAX_SHORT_INT
+from python_dns_client.shared.constants import MAX_SHORT_INT
 
 random.seed(time.time())
 
