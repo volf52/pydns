@@ -1,5 +1,6 @@
 import enum
 from dataclasses import dataclass
+
 from typing_extensions import Self
 
 from python_dns_client.constants import (

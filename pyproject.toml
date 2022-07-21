@@ -8,14 +8,60 @@ authors = ["Arslan <rslnkrmt2552@gmail.com>"]
 python = "^3.10"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
 ipython = "^8.4.0"
 dnslib = "^0.9.20"
-bitstring = "^3.1.9"
 isort = "^5.10.1"
 black = "^22.6.0"
 typing-extensions = "^4.3.0"
+pytest = "^7.1.2"
+pytest-sugar = "^0.9.5"
+pytest-xdist = "^2.5.0"
+mypy = "^0.971"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 79
+target-version = ['py310']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | \.vscode
+  | \.idea
+  | __pycache__
+  | \.pytest_cahce
+  | \.toml
+  | \.ini
+  | \.sh
+  | Dockerfile
+  | \.github
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 79
+src_paths = ["python_dns_client", "tests"]
+
+[tool.mypy]
+ignore_missing_imports = false
+
+[tool.mypy-pytest]
+ignore_missing_imports = true

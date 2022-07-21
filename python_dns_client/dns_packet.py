@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+
 from typing_extensions import Self
 
 from python_dns_client.header import DNSHeader
