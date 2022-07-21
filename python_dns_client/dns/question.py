@@ -28,14 +28,14 @@ class DNSQuestion(Packable):
 
     @classmethod
     def parse(cls, b: bytes) -> tuple[DNSQuestion, bytes]:
-        _packed = b
-
         lbl, b = LabelSequence.parse(b)
         assert len(b) >= 4  # must be 4 bytes or more
 
         (record_type_val,) = TWO_BYTE_STRUCT.unpack(b[:2])
         record_type = DNSRecordType(record_type_val)
         (_class,) = TWO_BYTE_STRUCT.unpack(b[2:4])
+
+        _packed = lbl.to_bytes() + record_type.to_bytes() + ONE_AS_SHORT
 
         return cls(lbl, record_type, _packed, _class), b[4:]
 
