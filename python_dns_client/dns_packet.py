@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
+# -*- coding: utf-8 -*-
+from __future__ import annotations
 
-from typing_extensions import Self
+from dataclasses import dataclass, field
 
 from python_dns_client.header import DNSHeader
 from python_dns_client.protocols import Packable
@@ -17,7 +18,7 @@ class DNSPacket(Packable):
     # additional: list[Packable] = field(default_factory=list)
 
     @classmethod
-    def parse(cls, b: bytes) -> Self:
+    def parse(cls, b: bytes) -> DNSPacket:
         header = DNSHeader.parse(b[:12])
 
         # todo: add check for resp code

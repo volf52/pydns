@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import enum
 from dataclasses import dataclass
-
-from typing_extensions import Self
 
 from python_dns_client.constants import (
     NULL_BYTE,
@@ -30,7 +31,7 @@ class LabelSequence(Packable):
     __packed: bytes
 
     @classmethod
-    def create(cls, domain: str) -> Self:
+    def create(cls, domain: str) -> LabelSequence:
         # buff = []
         # total = 0
 
@@ -55,7 +56,7 @@ class LabelSequence(Packable):
         return LabelSequence(domain, packed)
 
     @classmethod
-    def parse(cls, b: bytes) -> tuple[Self, bytes]:
+    def parse(cls, b: bytes) -> tuple[LabelSequence, bytes]:
         domain_parts = []
         idx = 0
         total_len = len(b)
@@ -66,7 +67,7 @@ class LabelSequence(Packable):
 
             if idx + part_length >= total_len:
                 raise ValueError(
-                    f"Invalid part length at idx {idx} for label sequence {b}"
+                    f"Invalid part length at idx {idx} for label sequence {b!r}"
                 )
 
             start = idx + 1
@@ -96,7 +97,7 @@ class DNSQuestion(Packable):
     _class: int = 1
 
     @classmethod
-    def create(cls, domain: str, record_type: DNSRecordType) -> Self:
+    def create(cls, domain: str, record_type: DNSRecordType) -> DNSQuestion:
         lbl_seq = LabelSequence.create(domain)
 
         packed = lbl_seq.to_bytes() + record_type.to_bytes() + ONE_AS_SHORT
@@ -104,7 +105,7 @@ class DNSQuestion(Packable):
         return cls(lbl_seq, record_type, packed)
 
     @classmethod
-    def parse(cls, b: bytes) -> tuple[Self, bytes]:
+    def parse(cls, b: bytes) -> tuple[DNSQuestion, bytes]:
         _packed = b
 
         lbl, b = LabelSequence.parse(b)
