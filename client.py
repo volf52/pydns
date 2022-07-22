@@ -24,7 +24,7 @@ try:
     resp_packet = DNSPacket.parse(resp)
     assert resp_packet.header.an_count > 0
 
-    print(resp_packet.answers[-1].data)
+    print(resp_packet.answers[-1].rdata)
 finally:
     sock.close()
     print("Done")

@@ -21,11 +21,15 @@ class DNSResponse(Packable):
     _class: int
     ttl: int
     _len: int
-    data: str
+    rdata: str
 
     __packed: bytes
 
     BYTES_REQUIRED_AFTER_LBL: ClassVar = 10
+
+    ALLOWED_RECORD_VALUES: ClassVar[set[int]] = set(
+        x.value for x in DNSRecordType
+    )
 
     @classmethod
     def parse(cls, b: bytes):
@@ -39,6 +43,9 @@ class DNSResponse(Packable):
 
         b = buff.get(DNSResponse.BYTES_REQUIRED_AFTER_LBL)
         (record_type_val,) = TWO_BYTE_STRUCT.unpack(b[:2])
+        if record_type_val not in DNSResponse.ALLOWED_RECORD_VALUES:
+            raise ValueError(f"unsupported record value: {record_type_val}")
+
         record_type = DNSRecordType(record_type_val)
 
         (_class,) = TWO_BYTE_STRUCT.unpack(b[2:4])
@@ -48,16 +55,25 @@ class DNSResponse(Packable):
 
         # Answer
         assert buff.remaining >= _len
+        data_bytes = buff.get(_len)
 
-        ans_bytes = buff.get(_len)
-        ans_lst = []
-        for ans_byte in ans_bytes:
-            ans_lst.append(str(ans_byte))
+        if record_type == DNSRecordType.A:
+            rdata = DNSResponse._parse_ip_v4(data_bytes)
+        else:
+            rdata = ""
 
-        _packed = lbl.to_bytes() + b + ans_bytes
-        ans = ".".join(ans_lst)
+        _packed = lbl.to_bytes() + b + data_bytes
 
-        return cls(lbl, record_type, _class, ttl, _len, ans, _packed)
+        return cls(lbl, record_type, _class, ttl, _len, rdata, _packed)
 
     def to_bytes(self) -> bytes:
         return self.__packed
+
+    @staticmethod
+    def _parse_ip_v4(b: bytes) -> str:
+        ip_parts = []
+        for bt in b:
+            ip_parts.append(str(bt))
+
+        ip = ".".join(ip_parts)
+        return ip

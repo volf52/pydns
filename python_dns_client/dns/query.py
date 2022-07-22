@@ -22,5 +22,5 @@ class DNSQuery:
         return DNSQuery.create(domain, DNSRecordType.CNAME)
 
     @staticmethod
-    def text_query(domain: str) -> DNSPacket:
-        return DNSQuery.create(domain, DNSRecordType.TXT)
+    def ip_v6_query(domain: str) -> DNSPacket:
+        return DNSQuery.create(domain, DNSRecordType.AAAA)
