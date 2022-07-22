@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import ClassVar
 
@@ -26,6 +27,7 @@ class DNSResponse(Packable):
     __packed: bytes
 
     BYTES_REQUIRED_AFTER_LBL: ClassVar = 10
+    IPV6_FORMAT_COLON_RE: ClassVar = re.compile(r"(::){2,}")
 
     ALLOWED_RECORD_VALUES: ClassVar[set[int]] = set(
         x.value for x in DNSRecordType
@@ -59,6 +61,8 @@ class DNSResponse(Packable):
 
         if record_type == DNSRecordType.A:
             rdata = DNSResponse._parse_ip_v4(data_bytes)
+        elif record_type == DNSRecordType.AAAA:
+            rdata = DNSResponse._parse_ip_v6(data_bytes)
         else:
             rdata = ""
 
@@ -76,4 +80,15 @@ class DNSResponse(Packable):
             ip_parts.append(str(bt))
 
         ip = ".".join(ip_parts)
+        return ip
+
+    @staticmethod
+    def _parse_ip_v6(b: bytes) -> str:
+        ip_parts = []
+        for i in range(0, 16, 2):
+            ip_parts.append(b[i : i + 2].hex())
+
+        ip = ":".join(ip_parts).replace("0000", "")
+        ip = DNSResponse.IPV6_FORMAT_COLON_RE.sub("::", ip)
+
         return ip
