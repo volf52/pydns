@@ -59,9 +59,6 @@ class LabelSequence(Packable):
         while (idx := buff.pos) < total_len and (
             part_length := buff.pop()
         ) != 0:
-            if part_length == LabelSequence.JMP_BYTE:
-                jmp_idx = (part_length << 8) + buff.pop()
-
             if idx + part_length >= total_len:
                 raise ValueError(
                     f"Invalid part length at idx {idx} for label sequence {buff!r}"
@@ -74,7 +71,7 @@ class LabelSequence(Packable):
         domain = ".".join(domain_parts)
         b = buff.get_slice(init_pos, buff.pos + 1)
 
-        return LabelSequence(domain, buff.get_slice(init_pos, buff.pos))
+        return LabelSequence(domain, b)
 
     def to_bytes(self) -> bytes:
         return self.__packed
