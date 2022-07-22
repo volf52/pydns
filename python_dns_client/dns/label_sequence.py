@@ -45,7 +45,7 @@ class LabelSequence(Packable):
         total_len = len(buff)
 
         if utils.is_set(buff.peek, LabelSequence.JMP_BYTE):
-            assert buff.left >= 2
+            assert buff.remaining >= 2
 
             jmp_bytes = buff.get(2)
             (jmp_idx,) = TWO_BYTE_STRUCT.unpack(jmp_bytes)

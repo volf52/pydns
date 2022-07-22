@@ -26,8 +26,6 @@ class DNSResponse(Packable):
     __packed: bytes
 
     BYTES_REQUIRED_AFTER_LBL: ClassVar = 10
-    # packet_pos: int, jmp_state: dict[int, LabelSequence]
-    # jmp_state[packet_pos] = lbl
 
     @classmethod
     def parse(cls, b: bytes):
@@ -37,7 +35,7 @@ class DNSResponse(Packable):
     def parse_from(cls, buff: DNSBuffer) -> DNSResponse:
         lbl = LabelSequence.parse_from(buff)
 
-        assert buff.left >= DNSResponse.BYTES_REQUIRED_AFTER_LBL
+        assert buff.remaining >= DNSResponse.BYTES_REQUIRED_AFTER_LBL
 
         b = buff.get(DNSResponse.BYTES_REQUIRED_AFTER_LBL)
         (record_type_val,) = TWO_BYTE_STRUCT.unpack(b[:2])
@@ -49,7 +47,7 @@ class DNSResponse(Packable):
         (_len,) = TWO_BYTE_STRUCT.unpack(b[8:10])
 
         # Answer
-        assert buff.left >= _len
+        assert buff.remaining >= _len
 
         ans_bytes = buff.get(_len)
         ans_lst = []

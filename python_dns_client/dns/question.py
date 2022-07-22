@@ -40,7 +40,7 @@ class DNSQuestion(Packable):
         buff: DNSBuffer,
     ) -> DNSQuestion:
         lbl = LabelSequence.parse_from(buff)
-        assert buff.left >= DNSQuestion.BYTES_REQUIRED_AFTER_LBL
+        assert buff.remaining >= DNSQuestion.BYTES_REQUIRED_AFTER_LBL
 
         b = buff.get(DNSQuestion.BYTES_REQUIRED_AFTER_LBL)
         (record_type_val,) = TWO_BYTE_STRUCT.unpack(b[:2])

@@ -49,8 +49,12 @@ class DNSBuffer:
         return self.__b
 
     @property
-    def left(self) -> int:
+    def remaining(self) -> int:
         return self.__len - self.__pos
+
+    @property
+    def rest(self) -> bytes:
+        return self.__b[self.__pos :]
 
     @property
     def pos(self) -> int:
