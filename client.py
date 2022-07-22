@@ -16,7 +16,7 @@ try:
     sock.connect((DNS_SERVER, DNS_PORT))
     print("Connected!")
 
-    query = DNSQuery.ip_v6_query("google.com")
+    query = DNSQuery.cname_query("api.carbonteq-livestream.ml")
     query_bytes = query.to_bytes()
 
     sock.send(query_bytes)
@@ -29,7 +29,9 @@ try:
     resp_packet = DNSPacket.parse(resp)
     assert resp_packet.header.an_count > 0
 
-    print(resp_packet.answers[-1].rdata)
+    print("---------- Answers --------------")
+    for ans in resp_packet.answers:
+        print(ans)
 finally:
     sock.close()
     print("Done")

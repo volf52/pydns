@@ -22,7 +22,7 @@ class DNSResponse(Packable):
     _class: int
     ttl: int
     _len: int
-    rdata: str
+    rdata: str | LabelSequence
 
     __packed: bytes
 
@@ -57,12 +57,14 @@ class DNSResponse(Packable):
 
         # Answer
         assert buff.remaining >= _len
-        data_bytes = buff.get(_len)
+        data_bytes = buff.rest
 
         if record_type == DNSRecordType.A:
             rdata = DNSResponse._parse_ip_v4(data_bytes)
         elif record_type == DNSRecordType.AAAA:
             rdata = DNSResponse._parse_ip_v6(data_bytes)
+        elif record_type == DNSRecordType.CNAME:
+            rdata = DNSResponse._parse_cname(buff)
         else:
             rdata = ""
 
@@ -92,3 +94,10 @@ class DNSResponse(Packable):
         ip = DNSResponse.IPV6_FORMAT_COLON_RE.sub("::", ip)
 
         return ip
+
+    @staticmethod
+    def _parse_cname(buff: DNSBuffer) -> LabelSequence:
+        return LabelSequence.parse_from(buff)
+
+    def __str__(self) -> str:
+        return f"rtype={self.record_type} || rdata:{self.rdata}"

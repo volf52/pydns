@@ -77,7 +77,7 @@ class LabelSequence(Packable):
         return self.__packed
 
     def __str__(self) -> str:
-        return self.__packed.decode()
+        return f"LBL = {self.domain}"
 
     def __len__(self) -> int:
         return len(self.__packed)

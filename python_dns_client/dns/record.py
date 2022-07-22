@@ -11,6 +11,3 @@ class DNSRecordType(enum.Enum):
 
     def to_bytes(self) -> bytes:
         return TWO_BYTE_STRUCT.pack(self.value)
-
-    def __str__(self) -> str:
-        return self.to_bytes().decode()
