@@ -4,14 +4,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar
 
-import python_dns_client.shared.utils as utils
-from python_dns_client.dns.buffer import DNSBuffer
-from python_dns_client.shared.constants import (
-    NULL_BYTE,
-    ONE_BYTE_STRUCT,
-    TWO_BYTE_STRUCT,
-)
-from python_dns_client.shared.protocols import Packable
+import pydns.shared.utils as utils
+from pydns.dns.buffer import DNSBuffer
+from pydns.shared.constants import NULL_BYTE, ONE_BYTE_STRUCT, TWO_BYTE_STRUCT
+from pydns.shared.protocols import Packable
 
 
 @dataclass(frozen=True)

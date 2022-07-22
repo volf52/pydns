@@ -2,7 +2,7 @@
 import random
 import time
 
-from python_dns_client.shared.constants import MAX_SHORT_INT
+from pydns.shared.constants import MAX_SHORT_INT
 
 random.seed(time.time())
 

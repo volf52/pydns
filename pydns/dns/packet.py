@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from python_dns_client.dns.buffer import DNSBuffer
-from python_dns_client.dns.header import DNSHeader
-from python_dns_client.dns.question import DNSQuestion
-from python_dns_client.dns.response import DNSResponse
-from python_dns_client.shared.protocols import Packable
+from pydns.dns.buffer import DNSBuffer
+from pydns.dns.header import DNSHeader
+from pydns.dns.question import DNSQuestion
+from pydns.dns.response import DNSResponse
+from pydns.shared.protocols import Packable
 
 
 @dataclass

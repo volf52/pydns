@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "python-dns-client"
+name = "pydns"
 version = "0.1.0"
 description = ""
 authors = ["Arslan <rslnkrmt2552@gmail.com>"]

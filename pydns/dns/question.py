@@ -4,11 +4,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar
 
-from python_dns_client.dns.buffer import DNSBuffer
-from python_dns_client.dns.label_sequence import LabelSequence
-from python_dns_client.dns.record import DNSRecordType
-from python_dns_client.shared.constants import ONE_AS_SHORT, TWO_BYTE_STRUCT
-from python_dns_client.shared.protocols import Packable
+from pydns.dns.buffer import DNSBuffer
+from pydns.dns.label_sequence import LabelSequence
+from pydns.dns.record import DNSRecordType
+from pydns.shared.constants import ONE_AS_SHORT, TWO_BYTE_STRUCT
+from pydns.shared.protocols import Packable
 
 
 @dataclass(frozen=True)

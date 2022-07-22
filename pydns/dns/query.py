@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from python_dns_client.dns.header import DNSHeader
-from python_dns_client.dns.packet import DNSPacket
-from python_dns_client.dns.question import DNSQuestion
-from python_dns_client.dns.record import DNSRecordType
+from pydns.dns.header import DNSHeader
+from pydns.dns.packet import DNSPacket
+from pydns.dns.question import DNSQuestion
+from pydns.dns.record import DNSRecordType
 
 
 class DNSQuery:

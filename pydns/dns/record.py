@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import enum
 
-from python_dns_client.shared.constants import TWO_BYTE_STRUCT
+from pydns.shared.constants import TWO_BYTE_STRUCT
 
 
 class DNSRecordType(enum.Enum):

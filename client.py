@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import socket
 
-from python_dns_client.dns.packet import DNSPacket
-from python_dns_client.dns.query import DNSQuery
+from pydns.dns.packet import DNSPacket
+from pydns.dns.query import DNSQuery
 
 DNS_SERVER = "8.8.8.8"
 DNS_PORT = 53
